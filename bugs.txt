@@ -15,3 +15,40 @@ another description.
     <paste offending line(s) of code here>
 
 # many more come here
+
+[zookd.c:70]
+reqpath can overflow if a line if url in http request is longer than 2048
+bytes because url_decode on http.c:105 reads from 8KiB long buffer.
+Y
+
+
+[zookd.c:70]
+envp can overflow because of the sprintf() inside http_request_line,
+in case the protocol/HTTP version field is 8KiB long.
+N
+
+
+[zookd.c:70]
+envp can overflow because of the sprintf() inside http_request_line,
+in case the GET query string is 8KiB long.
+N
+
+
+[zookd.c:70]
+envp can overflow because of the sprintf() inside http_request_line,
+in case the request URL is 8KiB long.
+N
+
+
+[http.c:159]
+value can overflow if a header value in HTTP request is longer than 512B.
+This is possible because a line can be up to 8KiB long (stored in static char buf[8192]).
+Y
+
+[http.c:282]
+pn can overflow if HTTP request URL is longer than 1024 bytes.
+It can overwrite the function handler (and of course also the parameter values and return address).
+N
+
+
+
