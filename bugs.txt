@@ -17,7 +17,7 @@ another description.
 # many more come here
 
 [zookd.c:70]
-reqpath can overflow if a line if url in http request is longer than 2048
+reqpath can overflow HTTP request URL is longer than 2048
 bytes because url_decode on http.c:105 reads from 8KiB long buffer.
 Y
 
