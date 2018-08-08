@@ -16,7 +16,7 @@
 	movb	%al,(STRLEN)(%esi)	/* null-terminate our string */
 
 	movb	$SYS_unlink_dec,%al		/* syscall arg 1: syscall number */
-  inc %al
+	inc %al
 	movl	%esi,%ebx		/* syscall arg 2: string pathname */
 	int	$0x80			/* invoke syscall */
 
