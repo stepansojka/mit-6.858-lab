@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 /* launch a service */
 pid_t launch_svc(CONF *conf, const char *name)
 {
-    int fds[2], i;
+    int fds[2];
     pid_t pid;
     char *cmd, *args, *argv[32] = {0}, **ap, *dir;
     char *groups;
@@ -145,16 +145,12 @@ pid_t launch_svc(CONF *conf, const char *name)
                     break;
     }
 
-    if (NCONF_get_number_e(conf, name, "uid", &uid))
+    if ((dir = NCONF_get_string(conf, name, "dir")))
     {
-        /* change real, effective, and saved uid to uid */
-        warnx("setuid %ld", uid);
-    }
+        if (chroot(dir) < 0)
+          warnx("failed chroot to %s: %s", dir, strerror(errno));
 
-    if (NCONF_get_number_e(conf, name, "gid", &gid))
-    {
-        /* change real, effective, and saved gid to gid */
-        warnx("setgid %ld", gid);
+        chdir("/");
     }
 
     if ((groups = NCONF_get_string(conf, name, "extra_gids")))
@@ -162,14 +158,24 @@ pid_t launch_svc(CONF *conf, const char *name)
         ngids = 0;
         CONF_parse_list(groups, ',', 1, &group_parse_cb, NULL);
         /* set the grouplist to gids */
-        for (i = 0; i < ngids; i++)
-            warnx("extra gid %d", gids[i]);
+
+        if (setgroups(ngids, gids) < 0)
+            warnx("settings extra gids failed: %s", strerror(errno));
     }
 
-    if ((dir = NCONF_get_string(conf, name, "dir")))
+    if (NCONF_get_number_e(conf, name, "gid", &gid))
     {
-        if (chroot(dir) < 0)
-            warnx("failed chroot %s", strerror(errno));
+        /* change real, effective, and saved gid to gid */
+        if (setresgid(gid, gid, gid) < 0)
+          warnx("segid %ld failed: %s", gid, strerror(errno));
+    }
+
+
+    if (NCONF_get_number_e(conf, name, "uid", &uid))
+    {
+        /* change real, effective, and saved uid to uid */
+        if (setresuid(uid, uid, uid) < 0)
+          warnx("setuid %ld failed: %s", uid, strerror(errno));
     }
 
     signal(SIGCHLD, SIG_DFL);

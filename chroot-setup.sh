@@ -19,8 +19,8 @@ set_perms() {
     local perms="$2"
     local pn="$3"
 
-    chown $ownergroup $pn
-    chmod $perms $pn
+    chown -R $ownergroup $pn
+    chmod -R $perms $pn
 }
 
 rm -rf /jail
@@ -66,7 +66,13 @@ mknod /jail/dev/urandom c 1 9
 
 cp -r zoobar /jail/
 rm -rf /jail/zoobar/db
+set_perms 1000:1000 755 /jail/zoobar
+set_perms 1002:1002 755 /jail/zoobar/index.html
+set_perms 1002:1002 755 /jail/zoobar/media
+set_perms 1004:1003 755 /jail/zoobar/index.cgi
+
 
 python /jail/zoobar/zoodb.py init-person
 python /jail/zoobar/zoodb.py init-transfer
+set_perms 1003:1003 755 /jail/zoobar/db
 
