@@ -23,6 +23,8 @@ int main(int argc, char **argv)
     signal(SIGPIPE, SIG_IGN);
     signal(SIGCHLD, SIG_IGN);
 
+    chdir("/");
+    
     for (;;)
     {
         char envp[8192];

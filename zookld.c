@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <errno.h>
 #include "http.h"
 
 #define ZOOK_CONF    "zook.conf"
@@ -167,7 +168,8 @@ pid_t launch_svc(CONF *conf, const char *name)
 
     if ((dir = NCONF_get_string(conf, name, "dir")))
     {
-        /* chroot into dir */
+        if (chroot(dir) < 0)
+            warnx("failed chroot %s", strerror(errno));
     }
 
     signal(SIGCHLD, SIG_DFL);
