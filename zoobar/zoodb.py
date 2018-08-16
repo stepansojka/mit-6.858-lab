@@ -9,9 +9,13 @@ TransferBase = declarative_base()
 CredBase = declarative_base()
 
 class Cred(CredBase):
+    SALT_SIZE = 16
+    PASSWORD_HASH_SIZE = 32
+
     __tablename__ = "cred"
     username = Column(String(128), primary_key=True)
-    password = Column(String(128))
+    password_hash = Column(LargeBinary(PASSWORD_HASH_SIZE))
+    password_salt = Column(LargeBinary(SALT_SIZE))
     token = Column(String(128))
 
 
