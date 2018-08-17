@@ -18,7 +18,5 @@ class AuthRpcServer(rpclib.RpcServer):
 
 (_, dummy_zookld_fd, sockpath) = sys.argv
 
-print >> sys.stderr, 'uid: ', os.getuid()
-
 s = AuthRpcServer()
 s.run_sockpath_fork(sockpath)

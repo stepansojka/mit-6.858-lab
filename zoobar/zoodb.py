@@ -7,6 +7,7 @@ from debug import *
 PersonBase = declarative_base()
 TransferBase = declarative_base()
 CredBase = declarative_base()
+BankBase = declarative_base()
 
 class Cred(CredBase):
     SALT_SIZE = 16
@@ -22,7 +23,6 @@ class Cred(CredBase):
 class Person(PersonBase):
     __tablename__ = "person"
     username = Column(String(128), primary_key=True)
-    zoobars = Column(Integer, nullable=False, default=10)
     profile = Column(String(5000), nullable=False, default="")
 
 
@@ -33,6 +33,12 @@ class Transfer(TransferBase):
     recipient = Column(String(128))
     amount = Column(Integer)
     time = Column(String)
+
+
+class Bank(BankBase):
+    __tablename__ = "bank"
+    username = Column(String(128), primary_key=True)
+    zoobars = Column(Integer, nullable=False, default=10)
 
 
 def dbsetup(name, base):
@@ -52,11 +58,18 @@ def dbsetup(name, base):
 def cred_setup():
     return dbsetup("cred", CredBase)
 
+
 def person_setup():
     return dbsetup("person", PersonBase)
 
+
 def transfer_setup():
     return dbsetup("transfer", TransferBase)
+
+
+def bank_setup():
+    return dbsetup("bank", BankBase)
+
 
 import sys
 if __name__ == "__main__":
@@ -71,5 +84,7 @@ if __name__ == "__main__":
         transfer_setup()
     elif cmd == 'init-cred':
         cred_setup()
+    elif cmd == 'init-bank':
+        bank_setup()
     else:
         raise Exception("unknown command %s" % cmd)

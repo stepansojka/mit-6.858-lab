@@ -58,6 +58,7 @@ cp -r /usr/share/zoneinfo/America /jail/usr/share/zoneinfo/
 
 create_socket_dir /jail/echosvc 61010:61010 755
 create_socket_dir /jail/authsvc 1005:1005 755
+create_socket_dir /jail/banksvc 1006:1006 755
 
 mkdir -p /jail/tmp
 chmod a+rwxt /jail/tmp
@@ -76,7 +77,10 @@ set_perms 1004:1003 755 /jail/zoobar/index.cgi
 python /jail/zoobar/zoodb.py init-cred
 python /jail/zoobar/zoodb.py init-person
 python /jail/zoobar/zoodb.py init-transfer
+python /jail/zoobar/zoodb.py init-bank
 
 set_perms 1003:1003 770 /jail/zoobar/db
 set_perms 1005:1005 700 /jail/zoobar/db/cred
+set_perms 1006:1006 700 /jail/zoobar/db/bank
+set_perms 1006:1006 700 /jail/zoobar/db/transfer
 

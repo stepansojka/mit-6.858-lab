@@ -4,6 +4,7 @@ from debug import *
 import hashlib
 import random
 import os
+import bank_client
 import pbkdf2
 
 
@@ -45,6 +46,8 @@ def register(username, password):
     newperson.username = username
     person_db.add(newperson)
     person_db.commit()
+
+    bank_client.add_user(username)
 
     return newtoken(cred_db, newcred)
 
