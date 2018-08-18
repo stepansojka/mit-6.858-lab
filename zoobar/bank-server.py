@@ -7,8 +7,8 @@ import os
 from debug import *
 
 class BankRpcServer(rpclib.RpcServer):
-    def rpc_transfer(self, sender, recipient, zoobars):
-        return bank.transfer(sender, recipient, zoobars)
+    def rpc_transfer(self, sender, token, recipient, zoobars):
+        return bank.transfer(sender, token, recipient, zoobars)
 
     def rpc_balance(self, username):
         return bank.balance(username)
