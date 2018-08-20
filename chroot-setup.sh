@@ -64,6 +64,9 @@ create_socket_dir /jail/profilesvc 1007:1007 755
 mkdir -p /jail/tmp
 chmod a+rwxt /jail/tmp
 
+mkdir -p /jail/profile_tmp
+set_perms 1007:1007 777 /jail/profile_tmp
+
 mkdir -p /jail/dev
 mknod /jail/dev/urandom c 1 9
 

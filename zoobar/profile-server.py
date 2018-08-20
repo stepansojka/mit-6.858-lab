@@ -9,6 +9,7 @@ import hashlib
 import socket
 import bank_client
 import zoodb
+import base64
 
 from debug import *
 
@@ -55,7 +56,14 @@ class ProfileServer(rpclib.RpcServer):
     def rpc_run(self, pcode, user, visitor):
         uid = 1007
 
-        userdir = '/tmp'
+        userdir = os.path.join('/profile_tmp', base64.urlsafe_b64encode(user))
+
+        try:
+            os.mkdir(userdir)
+            os.chmod(userdir, 0o700)
+            os.chown(userdir, 1007, 1007)
+        except OSError:
+            pass
 
         (sa, sb) = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM, 0)
         pid = os.fork()
