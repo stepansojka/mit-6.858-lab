@@ -18,9 +18,16 @@ import time
 import errno
 
 class ProfileAPIServer(rpclib.RpcServer):
-    def __init__(self, user, visitor):
+    def __init__(self, uid, gid, user, visitor):
         self.user = user
         self.visitor = visitor
+
+        db = zoodb.cred_setup()
+        cred = db.query(zoodb.Cred).get(self.user)
+        self.token = cred.token
+
+        os.setresgid(gid, gid, gid)
+        os.setresuid(uid, uid, uid)
 
     def rpc_get_self(self):
         return self.user
@@ -42,26 +49,25 @@ class ProfileAPIServer(rpclib.RpcServer):
                }
 
     def rpc_xfer(self, target, zoobars):
-        db = zoodb.cred_setup()
-        cred = db.query(zoodb.Cred).get(self.user)
-
-        bank_client.transfer(self.user, cred.token, target, zoobars)
+        bank_client.transfer(self.user, self.token, target, zoobars)
 
 
 def run_profile(pcode, profile_api_client):
     globals = {'api': profile_api_client}
     exec pcode in globals
 
+
 class ProfileServer(rpclib.RpcServer):
     def rpc_run(self, pcode, user, visitor):
         uid = 1007
+        gid = 1003
 
         userdir = os.path.join('/profile_tmp', base64.urlsafe_b64encode(user))
 
         try:
             os.mkdir(userdir)
             os.chmod(userdir, 0o700)
-            os.chown(userdir, 1007, 1007)
+            os.chown(userdir, uid, gid)
         except OSError:
             pass
 
@@ -70,7 +76,7 @@ class ProfileServer(rpclib.RpcServer):
         if pid == 0:
             if os.fork() <= 0:
                 sa.close()
-                ProfileAPIServer(user, visitor).run_sock(sb)
+                ProfileAPIServer(uid, gid, user, visitor).run_sock(sb)
                 sys.exit(0)
             else:
                 sys.exit(0)
