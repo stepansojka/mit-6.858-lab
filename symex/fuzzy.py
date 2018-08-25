@@ -685,8 +685,6 @@ def concolic_test(testfunc, maxiter = 100, verbose = 0):
 
     if verbose > 1:
       print 'Test generated', len(cur_path_constr), 'branches:'
-      for (c, caller) in zip(cur_path_constr, cur_path_constr_callers):
-        print indent(z3expr(c, True)), '@', '%s:%d' % (caller[0], caller[1])
 
     ## for each branch, invoke Z3 to find an input that would go
     ## the other way, and add it to the list of inputs to explore.
@@ -727,6 +725,20 @@ def concolic_test(testfunc, maxiter = 100, verbose = 0):
     ##   such as if that variable turns out to be irrelevant to
     ##   the overall constraint, so be sure to preserve values
     ##   from the initial input (concrete_values).
+    for (c, caller) in zip(cur_path_constr, cur_path_constr_callers):
+      print indent(z3expr(c, True)), '@', '%s:%d' % (caller[0], caller[1])
+
+      neg_c = sym_not(c)
+      if neg_c in checked:
+        continue
+
+      checked.add(neg_c)
+
+      (ok, model) = fork_and_check(neg_c)
+      if ok == z3.sat:
+        new_inputs = concrete_values.copy()
+        new_inputs.update(model)
+        inputs.add(new_inputs, caller)
 
   if verbose > 0:
     print 'Stopping after', iter, 'iterations'
