@@ -531,7 +531,18 @@ class concolic_str(str):
 
   ## Exercise 4: your code here.
   ## Implement symbolic versions of string length (override __len__)
+  def __len__(self):
+    res = len(self.__v)
+    return concolic_int(sym_length(ast(self)), res)
+
   ## and contains (override __contains__).
+  def __contains__(self, o):
+    if isinstance(o, concolic_str):
+      res = self.__v.__contains__(o.__v)
+    else:
+      res = self.__v.__contains__(o)
+
+    return concolic_bool(sym_contains(ast(self), ast(o)), res)
 
   def startswith(self, o):
     res = self.__v.startswith(o)
