@@ -738,8 +738,18 @@ def concolic_test(testfunc, maxiter = 100, verbose = 0):
     ##   such as if that variable turns out to be irrelevant to
     ##   the overall constraint, so be sure to preserve values
     ##   from the initial input (concrete_values).
+
+    p = None
+    counter = 0
     for (c, caller) in zip(cur_path_constr, cur_path_constr_callers):
-      neg_c = sym_not(c)
+      if counter == 0:
+        neg_c = sym_not(c)
+        p = c
+      else:
+        neg_c = sym_and(p, sym_not(c))
+        p = sym_and(p, c)
+
+      counter += 1
       if neg_c in checked:
         continue
 
