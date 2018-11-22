@@ -37,6 +37,7 @@ def test_stuff():
   adduser(pdb, 'alice', 'atok')
   adduser(pdb, 'bob', 'btok')
   balance1 = sum([p.zoobars for p in pdb.query(zoobar.zoodb.Person).all()])
+  balance_by_user1 = { p.username: p.zoobars for p in pdb.query(zoobar.zoodb.Person).all() }
   pdb.commit()
 
   tdb = zoobar.zoodb.transfer_setup()
@@ -79,9 +80,17 @@ def test_stuff():
 
   ## Detect balance mismatch.
   ## When detected, call report_balance_mismatch()
+  balance2 = sum([p.zoobars for p in pdb.query(zoobar.zoodb.Person).all()])
+  if balance2 != balance1:
+    report_balance_mismatch()
 
   ## Detect zoobar theft.
   ## When detected, call report_zoobar_theft()
+  balance_by_user2 = { p.username: p.zoobars for p in pdb.query(zoobar.zoodb.Person).all() }
+  for person, balance in  balance_by_user1.iteritems():
+    if 'cookie_val' in fuzzy.concrete_values and person not in fuzzy.concrete_values['cookie_val'] and balance_by_user2[person] < balance:
+      report_zoobar_theft()
+
 
 fuzzy.concolic_test(test_stuff, maxiter=2000, verbose=1)
 
