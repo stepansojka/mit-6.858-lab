@@ -27,6 +27,11 @@
 
 from slimit import ast
 
+BLACKLISTED_PROPERTIES = [
+  '__proto__', 'constructor',
+  '__defineGetter__', '__defineSetter__'
+]
+
 class LabVisitor(object):
 
     def __init__(self):
@@ -35,6 +40,12 @@ class LabVisitor(object):
 
     def _make_indent(self):
         return ' ' * self.indent_level
+
+    def filter_property(self, prop):
+        if prop in BLACKLISTED_PROPERTIES:
+            return '__invalid__'
+
+        return prop
 
     def visit(self, node):
         method = 'visit_%s' % node.__class__.__name__
@@ -335,7 +346,7 @@ class LabVisitor(object):
             template = '(%s.%s)'
         else:
             template = '%s.%s'
-        s = template % (self.visit(node.node), self.unchecked_visit(node.identifier))
+        s = template % (self.visit(node.node), self.filter_property(self.unchecked_visit(node.identifier)))
         return s
 
     def visit_BracketAccessor(self, node):
