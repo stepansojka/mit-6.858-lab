@@ -387,5 +387,5 @@ class LabVisitor(object):
         return s
 
     def visit_This(self, node):
-        return 'this'
+        return 'this_check(this)'
 

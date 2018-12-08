@@ -39,6 +39,10 @@ libcode = '''
         return blacklist[s] ? 'bad' : s;
     }
 
+    function this_check(t) {
+        return t == window ? null : t;
+    }
+
     // Do not change these functions.
     function sandbox_grader(url) {
         window.location = url;
