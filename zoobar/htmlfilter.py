@@ -14,9 +14,22 @@ libcode = '''
             return {
                 get onclick() { return e.onclick; },
                 set onclick(h) { e.onclick = h; },
+
+                get textContent() { return e.textContent; },
+                set textContent(s) { return e.textContent = s; }
             }
         },
     };
+
+
+    function sandbox_eval(s) {}
+
+    function sandbox_setTimeout(fn, t) {
+        if (typeof fn == 'string')
+             return;
+
+        setTimeout(fn, t);
+    }
 
     // Do not change these functions.
     function sandbox_grader(url) {

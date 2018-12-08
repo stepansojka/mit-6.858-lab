@@ -31,6 +31,7 @@ class LabVisitor(object):
 
     def __init__(self):
         self.indent_level = 0
+        self.check = True
 
     def _make_indent(self):
         return ' ' * self.indent_level
@@ -38,6 +39,12 @@ class LabVisitor(object):
     def visit(self, node):
         method = 'visit_%s' % node.__class__.__name__
         return getattr(self, method, self.generic_visit)(node)
+
+    def unchecked_visit(self, node):
+        self.check = False
+        s = self.visit(node)
+        self.check = True
+        return s
 
     def generic_visit(self, node):
         return 'GEN: %r' % node
@@ -66,7 +73,10 @@ class LabVisitor(object):
         return ''.join(output)
 
     def visit_Identifier(self, node):
-        return node.value
+        if not self.check:
+            return node.value
+
+        return 'sandbox_' + node.value
 
     def visit_Assign(self, node):
         # Note: if node.op is ':' this "assignment" is actually a property in
@@ -74,12 +84,15 @@ class LabVisitor(object):
         # is either an ast.Identifier or an ast.String.
         if node.op == ':':
             template = '%s%s %s'
+            fn = self.unchecked_visit
         else:
             template = '%s %s %s'
+            fn = self.visit
         if getattr(node, '_parens', False):
             template = '(%s)' % template
+
         return template % (
-            self.visit(node.left), node.op, self.visit(node.right))
+            fn(node.left), node.op, self.visit(node.right))
 
     def visit_Number(self, node):
         return node.value
@@ -322,7 +335,7 @@ class LabVisitor(object):
             template = '(%s.%s)'
         else:
             template = '%s.%s'
-        s = template % (self.visit(node.node), self.visit(node.identifier))
+        s = template % (self.visit(node.node), self.unchecked_visit(node.identifier))
         return s
 
     def visit_BracketAccessor(self, node):
