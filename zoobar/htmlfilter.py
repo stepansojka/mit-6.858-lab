@@ -25,10 +25,18 @@ libcode = '''
     function sandbox_eval(s) {}
 
     function sandbox_setTimeout(fn, t) {
-        if (typeof fn == 'string')
-             return;
+        if (typeof fn == 'function')
+            setTimeout(fn, t);
+    }
 
-        setTimeout(fn, t);
+    var blacklist = {
+        '__proto__': true, 'constructor': true,
+        '__defineGetter__': true, '__defineSetter__': true
+    };
+
+    function bracket_check(val) {
+        var s = val+'';
+        return blacklist[s] ? 'bad' : s;
     }
 
     // Do not change these functions.
