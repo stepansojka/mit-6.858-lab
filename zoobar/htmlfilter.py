@@ -24,6 +24,8 @@ libcode = '''
 
     function sandbox_eval(s) {}
 
+    window.eval = function(s) {}
+
     function sandbox_setTimeout(fn, t) {
         if (typeof fn == 'function')
             setTimeout(fn, t);
